@@ -145,9 +145,8 @@ sed -e 's/^ \+//' -e 's/ \+/,/g' ${3}_pedr.asc | awk -F, 'NR > 2 {print($1","$2"
 
 inputTAB=${3}_pedr.tab
 
-# extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for proj)
-projstr=$(gdalsrsinfo -o proj4 $cube | sed 's/'\''//g')
-echo $projstr
+# Hard-code PROJ4 string for equirectangular using IAU datum for Mars
+projstr="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs"
 
 echo "#Latitude,Longitude,Datum_Elevation,Easting,Northing,Orbit" > ${3}_pedr.csv
 proj $projstr $inputTAB | sed 's/\t/,/g' | awk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr.csv
