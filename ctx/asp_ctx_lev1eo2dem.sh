@@ -154,14 +154,14 @@ scontrol show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
 ######
 ## Use GNU parallel to run many instances of cam2map4stereo.py at once and project the images of each stereopair into a common projection
 # Define a function that GNU parallel will call to run cam2map4stereo.py
-function cam2map4stereo() {
-    cd $3 
-cam2map4stereo.py $1.lev1eo.cub $2.lev1eo.cub
-}
-# export the function so GNU parallel can use it
-export -f cam2map4stereo
-# Run the function using parallel
-parallel --colsep ' ' --joblog parallel_cam2map4stereo.log cam2map4stereo :::: stereopairs.lis 
+# function cam2map4stereo() {
+#     cd $3 
+# cam2map4stereo.py $1.lev1eo.cub $2.lev1eo.cub
+# }
+# # export the function so GNU parallel can use it
+# export -f cam2map4stereo
+# # Run the function using parallel
+# parallel --colsep ' ' --joblog parallel_cam2map4stereo.log cam2map4stereo :::: stereopairs.lis 
 
 
 ##  Run ALL stereo in series for each stereopair using `parallel_stereo`
