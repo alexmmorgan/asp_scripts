@@ -79,15 +79,20 @@ fi
 ## Release the Kracken!
 
 date
+
+# Hard-code PROJ4 string for equirectangular using IAU datum for Mars
+proj="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs"
+
+
 # loop through the directories listed in "stereodirs.lis" and run through point2dem process
 for i in $( cat ${dirs} ); do
     echo Working on $i
-    cd $i
-    # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
-    proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
-    
     # Move down into the results directory for stereopair $i
-    cd ./results_map_ba
+    cd ${i}/results_map_ba
+
+    # # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
+    # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+    
     # run pc_align and send the output to a new subdirectory called dem_align
     echo "Running pc_align..."
     pc_align --num-iterations 2000 --threads 16 --max-displacement $maxd --highest-accuracy ${i}_map_ba-PC.tif ../${i}_pedr4align.csv -o dem_align/${i}_map_ba_align --datum D_MARS --save-inv-trans

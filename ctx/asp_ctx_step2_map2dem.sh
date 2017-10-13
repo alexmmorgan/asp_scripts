@@ -123,6 +123,9 @@ scontrol show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
 #######################################################
 
 
+# Hard-code PROJ4 string for equirectangular using IAU datum for Mars
+proj="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs"
+
 
 # Create low-resolution DEMs from point clouds created during earlier run
 # loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
@@ -131,7 +134,7 @@ for i in $( cat stereodirs.lis ); do
     cd $i
     
     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
-    proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+    # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
     
     # cd into the results directory for stereopair $i
     cd results_ba/	       
@@ -202,7 +205,7 @@ for i in $( cat stereodirs.lis ); do
     cd $i
     
     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
-    proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+    # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
     
     # cd into the results directory for stereopair $i
     cd results_map_ba/	       

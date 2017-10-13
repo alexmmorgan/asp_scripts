@@ -141,9 +141,9 @@ awk '{print $1" "$2 >$3"/stereopair.lis"}' stereopairs.lis
 
 
 
-# Move the Level 1eo cubes into the directory named for the stereopair they belong to
-awk '{print("mv "$1".lev1eo.cub "$3)}' stereopairs.lis | sh
-awk '{print("mv "$2".lev1eo.cub "$3)}' stereopairs.lis | sh
+# Copy the Level 1eo cubes into the directory named for the stereopair they belong to
+awk '{print("cp "$1".lev1eo.cub "$3)}' stereopairs.lis | sh
+awk '{print("cp "$2".lev1eo.cub "$3)}' stereopairs.lis | sh
 
 # If this script is run as part of a job on a computing cluster using SLURM, we write the nodelist to a file named "nodelist.lis" so parallel_stereo can use it
 # This line is NOT portable to environments that are NOT running SLURM
