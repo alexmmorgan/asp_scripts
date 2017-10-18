@@ -193,7 +193,7 @@ for i in $( cat stereodirs.lis ); do
 
     # attempt to optimize parallel_stereo for running on 16-core machines for Steps 2 (refinement) and 3 (filtering)
     # Users should customize the number of processors, threads for multiprocessing and threads for single processing to values that suit their hardware
-    parallel_stereo --nodes-list=../nodelist.lis --processes 2 --threads-multiprocess 8 --threads-singleprocess 16 --entry-point 2 --stop-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
+    parallel_stereo --nodes-list=../nodelist.lis --processes 4 --threads-multiprocess 7 --threads-singleprocess 28 --entry-point 2 --stop-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
 
     # finish parallel_stereo using default options for Stage 4 (Triangulation)
     parallel_stereo --nodes-list=../nodelist.lis --entry-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba

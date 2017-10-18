@@ -129,20 +129,20 @@ proj="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 
 
 # Create low-resolution DEMs from point clouds created during earlier run
 # loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
-for i in $( cat stereodirs.lis ); do
-    # cd into the results directory for stereopair $i
-    cd ${i}/results_ba
+# for i in $( cat stereodirs.lis ); do
+#     # cd into the results directory for stereopair $i
+#     cd ${i}/results_ba
     
-    # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
-    # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+#     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
+#     # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
 
-    # run point2dem to create 100 m/px DEM with 50 px hole-filling
-    echo point2dem --threads 16 --t_srs \"${proj}\" -r mars --nodata -32767 -s 100 --dem-hole-fill-len 50 ${i}_ba-PC.tif -o dem/${i}_ba_100_fill50 | sh
+#     # run point2dem to create 100 m/px DEM with 50 px hole-filling
+#     echo point2dem --threads 28 --t_srs \"${proj}\" -r mars --nodata -32767 -s 100 --dem-hole-fill-len 50 ${i}_ba-PC.tif -o dem/${i}_ba_100_fill50 | sh
    
-    # Generate hillshade (useful for getting feel for textural quality of the DEM)
-    gdaldem hillshade ./dem/${i}_ba_100_fill50-DEM.tif ./dem/${i}_ba_100_fill50-hillshade.tif
-    cd ../../
-done
+#     # Generate hillshade (useful for getting feel for textural quality of the DEM)
+#     gdaldem hillshade ./dem/${i}_ba_100_fill50-DEM.tif ./dem/${i}_ba_100_fill50-hillshade.tif
+#     cd ../../
+# done
 
 
 
@@ -166,11 +166,11 @@ fi
     Lcam=$(awk '{print($1".lev1eo.cub")}' stereopair.lis)
     Rcam=$(awk '{print($2".lev1eo.cub")}' stereopair.lis)
 
-   # ## Mapproject the CTX images against a specific DTM using the adjusted camera information
-   echo "Projecting "$Lcam" against "$refdem
-   awk -v refdem=$refdem -v L=$Lcam '{print("mapproject -t isis "refdem" "L" "$1".ba.map.tif --mpp 6 --bundle-adjust-prefix adjust/ba")}' stereopair.lis | sh
-   echo "Projecting "$Rcam" against "$refdem
-   awk -v refdem=$refdem -v R=$Rcam '{print("mapproject -t isis "refdem" "R" "$2".ba.map.tif --mpp 6 --bundle-adjust-prefix adjust/ba")}' stereopair.lis | sh
+   # # ## Mapproject the CTX images against a specific DTM using the adjusted camera information
+   # echo "Projecting "$Lcam" against "$refdem
+   # awk -v refdem=$refdem -v L=$Lcam '{print("mapproject -t isis "refdem" "L" "$1".ba.map.tif --mpp 6 --bundle-adjust-prefix adjust/ba")}' stereopair.lis | sh
+   # echo "Projecting "$Rcam" against "$refdem
+   # awk -v refdem=$refdem -v R=$Rcam '{print("mapproject -t isis "refdem" "R" "$2".ba.map.tif --mpp 6 --bundle-adjust-prefix adjust/ba")}' stereopair.lis | sh
 
    # Store the names of the map-projected cubes in variables
    Lmap=$(awk '{print($1".ba.map.tif")}' stereopair.lis)
@@ -186,8 +186,8 @@ fi
     # stop parallel_stereo after correlation
     parallel_stereo --nodes-list=../nodelist.lis -t isis --stop-point 2 $Lmap $Rmap $Lcam $Rcam -s ${config} results_map_ba/${i}_map_ba --bundle-adjust-prefix adjust/ba $refdem
 
-    # attempt to optimize parallel_stereo for running on the sandyb nodes (16 cores each) for Steps 2 (refinement) and 3 (filtering)
-    parallel_stereo --nodes-list=../nodelist.lis -t isis --processes 2 --threads-multiprocess 8 --threads-singleprocess 16 --entry-point 2 --stop-point 4 $Lmap $Rmap $Lcam $Rcam -s ${config} results_map_ba/${i}_map_ba --bundle-adjust-prefix adjust/ba $refdem
+    # attempt to optimize parallel_stereo for Steps 2 (refinement) and 3 (filtering)
+    parallel_stereo --nodes-list=../nodelist.lis -t isis --processes 5 --threads-multiprocess 5 --threads-singleprocess 28 --entry-point 2 --stop-point 4 $Lmap $Rmap $Lcam $Rcam -s ${config} results_map_ba/${i}_map_ba --bundle-adjust-prefix adjust/ba $refdem
 
     # finish parallel_stereo using default options for Stage 4 (Triangulation)
     parallel_stereo --nodes-list=../nodelist.lis -t isis --entry-point 4 $Lmap $Rmap $Lcam $Rcam -s ${config} results_map_ba/${i}_map_ba --bundle-adjust-prefix adjust/ba $refdem
@@ -206,7 +206,7 @@ for i in $( cat stereodirs.lis ); do
     # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
     
     # run point2dem with orthoimage and intersection error image outputs. no hole filling
-    echo point2dem --threads 16 --t_srs \"${proj}\" -r mars --nodata -32767 -s 24 -n --errorimage ${i}_map_ba-PC.tif --orthoimage ${i}_map_ba-L.tif -o dem/${i}_map_ba | sh
+    echo point2dem --threads 28 --t_srs \"${proj}\" -r mars --nodata -32767 -s 24 -n --errorimage ${i}_map_ba-PC.tif --orthoimage ${i}_map_ba-L.tif -o dem/${i}_map_ba | sh
 
     # Generate hillshade (useful for getting feel for textural quality of the DEM)
     gdaldem hillshade ./dem/${i}_map_ba-DEM.tif ./dem/${i}_map_ba-hillshade.tif
