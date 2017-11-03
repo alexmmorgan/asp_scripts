@@ -127,8 +127,8 @@ scontrol show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
 proj="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs"
 
 
-Create low-resolution DEMs from point clouds created during earlier run
-loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
+# Create low-resolution DEMs from point clouds created during earlier run
+# loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
 for i in $( cat stereodirs.lis ); do
     # cd into the results directory for stereopair $i
     cd ${i}/results_ba
