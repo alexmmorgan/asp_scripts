@@ -97,11 +97,27 @@ parallel_pedr_bin4pc_align (){
     # Get the name of the first map-projected cube listed in stereopairs.lis
     cube=${1}.map.cub 
 
-    # # Get the bounding coordinates for the cube named above
-    minlong=$(getkey from=${cube} grpname=Mapping keyword=MinimumLongitude)
-    maxlat=$(getkey from=${cube} grpname=Mapping keyword=MaximumLatitude)
-    maxlong=$(getkey from=${cube} grpname=Mapping keyword=MaximumLongitude)
-    minlat=$(getkey from=${cube} grpname=Mapping keyword=MinimumLatitude)
+    ## Test that the cube exists
+    if [[ -e ${cube}  ]]; then
+        # # Get the bounding coordinates for the cube named above
+	minlong=$(getkey from=${cube} grpname=Mapping keyword=MinimumLongitude)
+        maxlat=$(getkey from=${cube} grpname=Mapping keyword=MaximumLatitude)
+        maxlong=$(getkey from=${cube} grpname=Mapping keyword=MaximumLongitude)
+        minlat=$(getkey from=${cube} grpname=Mapping keyword=MinimumLatitude)	
+
+	## If at least one of the lat/long extent variables are empty, throw an error and exit
+	if [[ $(echo $minlong) = "" ]] || [[ $(echo $maxlat) = "" ]] || [[ $(echo $maxlong) = "" ]] || [[ $(echo $minlat) = "" ]]; then
+	    echo "Unable to extract lat/long extent" 1>&2
+	    echo "Verify that "${cube}" is a map-projected ISIS3 cube" 1>&2
+	    exit 1	    
+	fi
+    else
+	echo ${cube}" not found" 1>&2
+	exit 1
+    fi
+    
+    
+    
 
 ##########################################################    
 # Build a PEDR2TAB.PRM file for pedr2tab
