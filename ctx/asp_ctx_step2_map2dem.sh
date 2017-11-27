@@ -79,6 +79,10 @@ fi
 
 # If we've made it this far, commandline args look sane and specified files exist
 
+# Script assumes that the subdirectories for each stereopair are within the current working directory
+# Store the working directory in a variable
+workdir=${PWD}
+
 # Check that ISIS has been initialized already
 
     # Check that ISIS has been initialized by looking for pds2isis,
@@ -131,7 +135,7 @@ proj="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 
 # loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
 for i in $( cat stereodirs.lis ); do
     # cd into the results directory for stereopair $i
-    cd ${i}/results_ba
+    cd ${workdir}/${i}/results_ba
     
     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
     # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
@@ -141,7 +145,7 @@ for i in $( cat stereodirs.lis ); do
    
     # Generate hillshade (useful for getting feel for textural quality of the DEM)
     gdaldem hillshade ./dem/${i}_ba_100_fill50-DEM.tif ./dem/${i}_ba_100_fill50-hillshade.tif
-    cd ../../
+    cd ${workdir}
 done
 
 
@@ -149,7 +153,7 @@ done
 ##   Start the big bad FOR loop to mapproject the bundle_adjust'd images onto the corresponding low-res DEM and pass to parallel_stereo
 for i in $( cat stereodirs.lis ); do
 
-    cd $i
+    cd ${workdir}/$i
     
 # Store the complete path to the DEM we will use as the basis of the map projection step in a variable called $refdem
 refdem=${PWD}/results_ba/dem/${i}_ba_100_fill50-DEM.tif
@@ -158,7 +162,7 @@ refdem=${PWD}/results_ba/dem/${i}_ba_100_fill50-DEM.tif
 if [ ! -s "$refdem" ]; then
     echo "The specified DEM does not exist or has zero size"
     echo $refdem
-    cd ../
+    cd ${workdir}
     continue
 fi
 
@@ -192,7 +196,7 @@ fi
     # finish parallel_stereo using default options for Stage 4 (Triangulation)
     parallel_stereo --nodes-list=../nodelist.lis -t isis --entry-point 4 $Lmap $Rmap $Lcam $Rcam -s ${config} results_map_ba/${i}_map_ba --bundle-adjust-prefix adjust/ba $refdem
     
-    cd ../
+    cd ${workdir}
     echo "Finished parallel_stereo on "$i" at "$(date)
 done
 
@@ -200,7 +204,7 @@ done
 # loop through the directories listed in stereodirs.lis and run point2dem, image footprint and hillshade generation
 for i in $( cat stereodirs.lis ); do
     # cd into the results directory for stereopair $i
-    cd ${i}/results_map_ba
+    cd ${workdir}/${i}/results_map_ba
     
     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
     # proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
@@ -217,7 +221,7 @@ for i in $( cat stereodirs.lis ); do
     # # If you don't have this tool installed and don't comment out the next line, the script will throw an error but will continue to execute
     # gdal_trace_outline dem/${i}_ba-DEM.tif -ndv -32767 -erosion -out-cs en -ogr-out dem/${i}_ba_footprint.shp
 
-    cd ../../
+    cd ${workdir}
 done
 
 date

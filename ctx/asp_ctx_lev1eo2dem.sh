@@ -79,6 +79,10 @@ fi
 
 # If we've made it this far, commandline args look sane and specified files exist
 
+# Script assumes that the subdirectories for each stereopair are within the current working directory
+# Store the working directory in a variable
+workdir=${PWD}
+
     # Check that ISIS has been initialized by looking for pds2isis,
     #  if not, initialize it
     if [[ $(which pds2isis) = "" ]]; then
@@ -168,7 +172,7 @@ scontrol show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
 # This is not the most resource efficient way of doing this but it's a hell of a lot more efficient compared to using plain `stereo` in series
 for i in $( cat stereodirs.lis ); do
     
-    cd $i
+    cd ${workdir}/$i
     # Store the names of the Level1 EO cubes in variables
     L=$(awk '{print($1".lev1eo.cub")}' stereopair.lis)
     R=$(awk '{print($2".lev1eo.cub")}' stereopair.lis)
@@ -198,7 +202,7 @@ for i in $( cat stereodirs.lis ); do
     # finish parallel_stereo using default options for Stage 4 (Triangulation)
     parallel_stereo --nodes-list=../nodelist.lis --entry-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
     
-    cd ../
+    cd ${workdir}
     echo "Finished parallel_stereo on "$i" at "$(date)
 done
 
