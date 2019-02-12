@@ -62,13 +62,13 @@ if [ ! -e "$Rcam" ]; then
 fi
 
 ## Validate stage number
-if ([ "$stage" -ge 0 ]  && [ "$stage" -le 4 ]) ; then
+if ([ "$stage" -ge 0 ]  && [ "$stage" -le 5 ]) ; then
     stop=$(($stage + 1))
     echo "Running Stage "$stage
 else
     # print_usage
     echo $stage " is not a valid stage number."
-    echo "Acceptable values: 1, 2, 3, 4"
+    echo "Acceptable values: 0, 1, 2, 3, 4, 5"
     # exit 1
 fi
 
