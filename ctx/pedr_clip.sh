@@ -29,8 +29,10 @@ cd $stereopair
 #  Here we will assume a Step 2 DEM that was processed from map-projected, bundle_adjusted data:
 dtmpath="results_map_ba/dem"
 
-gdal_trace_outline ${dtmpath}/${stereopair}_map_ba-DEM.tif -ndv -32767 -erosion -out-cs en -ogr-out ${dtmpath}/${stereopair}_map_ba_footprint.shp
-
+# Create a mask as a VRT based on the Step-2 DEM
+gdal_translate -scale -32766 32767 1 1 -ot Byte -of vrt -a_nodata 0 ${dtmpath}/${stereopair}_map_ba-DEM.tif ${dtmpath}/${stereopair}_map_ba-DEM_mask.vrt
+# Create a footprint polygon from the mask
+gdal_polygonize.py -8 ${dtmpath}/${stereopair}_map_ba-DEM_mask.vrt -f "ESRI Shapefile" ${dtmpath}/${stereopair}_map_ba_footprint.shp ${stereopair}_map_ba_footprint DN
 # Apply a -400 meter buffer to the corresponding footprint file
 ogr2ogr -f "ESRI Shapefile" ${dtmpath}/${stereopair}_map_ba_footprint_buff.shp ${dtmpath}/${stereopair}_map_ba_footprint.shp -dialect sqlite -sql "select ST_buffer(Geometry,-400),FID from ${stereopair}_map_ba_footprint"
 
