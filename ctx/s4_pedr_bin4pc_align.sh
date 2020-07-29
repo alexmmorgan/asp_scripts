@@ -141,16 +141,19 @@ pedr2tab $pedr_list > ${3}_pedr2tab.log
 #   Longitude, Latitude, Datum_Elevation, Longitude, Latitude, Orbit
 #  We print the Longitude and Latitude columns twice to make things easier later after running `proj`
 # Delete 1 or more spaces at the beginning of each line and convert groups of 1 or more remaining spaces to a single comma | Rearrange the columns and calculate datum elevation | convert comma delimiter to tab delimiter and direct to file
-sed -e 's/^ \+//' -e 's/ \+/,/g' ${3}_pedr.asc | awk -F, 'NR > 2 {print($1","$2","($5 - 3396190)","$1","$2","$10)}' | sed 's/,/\t/g' > ${3}_pedr.tab
+#sed -e 's/^ \+//' -e 's/ \+/,/g' ${3}_pedr.asc | awk -F, 'NR > 2 {print($1","$2","($5 - 3396190)","$1","$2","$10)}' | sed 's/,/\t/g' > ${3}_pedr.tab
+gsed -e 's/^ \+//' -e 's/ \+/,/g' ${3}_pedr.asc | gawk -F, 'NR > 2 {print($1","$2","($5 - 3396190)","$1","$2","$10)}' | gsed 's/,/\t/g' > ${3}_pedr.tab
 
 inputTAB=${3}_pedr.tab
 
 # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for proj)
-projstr=$(gdalsrsinfo -o proj4 $cube | sed 's/'\''//g')
+#projstr=$(gdalsrsinfo -o proj4 $cube | sed 's/'\''//g')
+projstr=$(gdalsrsinfo -o proj4 $cube | gsed 's/'\''//g')
 echo $projstr
 
 echo "#Latitude,Longitude,Datum_Elevation,Easting,Northing,Orbit" > ${3}_pedr.csv
-proj $projstr $inputTAB | sed 's/\t/,/g' | awk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr.csv
+#proj $projstr $inputTAB | sed 's/\t/,/g' | awk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr.csv
+proj $projstr $inputTAB | gsed 's/\t/,/g' | gawk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr.csv
 
 # # Clean up extraneous files
  rm ${3}_pedr.asc ${3}_pedr.tab
@@ -164,6 +167,7 @@ proj $projstr $inputTAB | sed 's/\t/,/g' | awk -F, '{print($5","$4","$3","$1","$
 export -f parallel_pedr_bin4pc_align
 
 # Call the function
-awk -v pedrlist=$pedr_list '{print($0" "pedrlist)}' stereopairs.lis | parallel --joblog parallel_pedr_bin4pc_align.log --colsep ' ' parallel_pedr_bin4pc_align
+#awk -v pedrlist=$pedr_list '{print($0" "pedrlist)}' stereopairs.lis | parallel --joblog parallel_pedr_bin4pc_align.log --colsep ' ' parallel_pedr_bin4pc_align
+gawk -v pedrlist=$pedr_list '{print($0" "pedrlist)}' stereopairs.lis | parallel --joblog parallel_pedr_bin4pc_align.log --colsep ' ' parallel_pedr_bin4pc_align
 
 date

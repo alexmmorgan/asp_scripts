@@ -84,7 +84,8 @@ for i in $( cat ${dirs} ); do
     echo Working on $i
     cd $i
     # extract the proj4 string from one of the map-projected image cubes and store it in a variable (we'll need it later for point2dem)
-    proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+    #proj=$(awk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | sed 's/'\''//g')
+    proj=$(gawk '{print("gdalsrsinfo -o proj4 "$1".map.cub")}' stereopair.lis | sh | gsed 's/'\''//g')
     
     # Move down into the results directory for stereopair $i
     cd ./results_map_ba
