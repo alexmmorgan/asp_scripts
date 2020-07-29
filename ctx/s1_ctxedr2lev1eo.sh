@@ -129,7 +129,7 @@ echo "Start ctxedr2lev1eo.sh "$(date)
 echo "${edrarr[@]}" | tr ' ' '\n' | parallel --joblog mroctx2isis.log mroctx2isis from={} to={.}.cub
 
 #Add SPICE data using spiceinit
-parallel --joblog spiceinit.log spiceinit from={}.cub ::: ${prodarr[@]} 
+parallel --joblog spiceinit.log spiceinit  web=yes from={}.cub ::: ${prodarr[@]} 
 
 #Apply spicefit as appropriate based on input flag
 if [[ "$n" -eq 1 ]]; then
