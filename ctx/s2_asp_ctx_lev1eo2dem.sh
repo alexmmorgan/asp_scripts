@@ -102,13 +102,11 @@ fi
 #######################################################
 # Create a 3-column, space-delimited file containing list of CTX stereo product IDs and the name of the corresponding directory that will be created for each pair
 # For the sake of concision, we remove the the 2 character command mode indicator and the 1x1 degree region indicator from the directory name
-#awk '{printf "%s ", $0}!(NR % 2){printf "\n"}' $prods | sed 's/ /_/g' | awk -F_ '{print($1"_"$2"_"$3"_"$4"_"$5" "$6"_"$7"_"$8"_"$9"_"$10" "$1"_"$2"_"$3"_"$6"_"$7"_"$8)}' > stereopairs.lis
 gawk '{printf "%s ", $0}!(NR % 2){printf "\n"}' $prods | gsed 's/ /_/g' | gawk -F_ '{print($1"_"$2"_"$3"_"$4"_"$5" "$6"_"$7"_"$8"_"$9"_"$10" "$1"_"$2"_"$3"_"$6"_"$7"_"$8)}' > stereopairs.lis
 
 
 # Extract Column 3 (the soon-to-be- directory names) from stereopairs.lis and write it to a file called stereodirs.lis
 # This file will be specified as an input argument for asp_ctx_map2dem.sh or asp_ctx_para_map2dem.sh
-#awk '{print($3)}' stereopairs.lis > stereodirs.lis
 gawk '{print($3)}' stereopairs.lis > stereodirs.lis
 
 # Make directories named according to the lines in stereodirs.lis
@@ -116,7 +114,6 @@ mkdir $(cat stereodirs.lis )
 
 # Now extract each line from stereopairs.lis (created above) and write it to a textfile inside the corresponding subdirectory we created on the previous line
 # These files are used to ensure that the input images are specified in the same order during every step of `stereo` in ASP
-#awk '{print $1" "$2 >$3"/stereopair.lis"}' stereopairs.lis
 gawk '{print $1" "$2 >$3"/stereopair.lis"}' stereopairs.lis
 
 ####################################################################################
@@ -146,9 +143,7 @@ gawk '{print $1" "$2 >$3"/stereopair.lis"}' stereopairs.lis
 
 
 # Move the Level 1eo cubes into the directory named for the stereopair they belong to
-#awk '{print("mv "$1".lev1eo.cub "$3)}' stereopairs.lis | sh
 gawk '{print("mv "$1".lev1eo.cub "$3)}' stereopairs.lis | sh
-#awk '{print("mv "$2".lev1eo.cub "$3)}' stereopairs.lis | sh
 gawk '{print("mv "$2".lev1eo.cub "$3)}' stereopairs.lis | sh
 
 # If this script is run as part of a job on a computing cluster using SLURM, we write the nodelist to a file named "nodelist.lis" so parallel_stereo can use it
@@ -176,9 +171,7 @@ for i in $( cat stereodirs.lis ); do
     
     cd $i
     # Store the names of the Level1 EO cubes in variables
-    #L=$(awk '{print($1".lev1eo.cub")}' stereopair.lis)
     L=$(gawk '{print($1".lev1eo.cub")}' stereopair.lis)
-    #R=$(awk '{print($2".lev1eo.cub")}' stereopair.lis)
     R=$(gawk '{print($2".lev1eo.cub")}' stereopair.lis)
 
     # Run ASP's bundle_adjust on the given stereopair
