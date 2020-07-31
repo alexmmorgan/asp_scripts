@@ -94,8 +94,7 @@ fi
 
 ######
 
-    date
-
+    echo "Start asp_ctx_lev1eo2dem.sh "$(date)
 
 #######################################################
 ## Housekeeping and Creating Some Support Files for ASP
@@ -148,7 +147,7 @@ gawk '{print("mv "$2".lev1eo.cub "$3)}' stereopairs.lis | sh
 
 # If this script is run as part of a job on a computing cluster using SLURM, we write the nodelist to a file named "nodelist.lis" so parallel_stereo can use it
 # This line is NOT portable to environments that are NOT running SLURM
-scontrol show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
+#control show hostname $SLURM_NODELIST | tr ' ' '\n' > nodelist.lis
 #######################################################
 
     
@@ -190,14 +189,14 @@ for i in $( cat stereodirs.lis ); do
     echo "Begin parallel_stereo on "$i" at "$(date)
     
     # stop parallel_stereo after correlation
-    parallel_stereo --nodes-list=../nodelist.lis --stop-point 2 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
+    parallel_stereo --stop-point 2 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
 
     # attempt to optimize parallel_stereo for running on 16-core machines for Steps 2 (refinement) and 3 (filtering)
     # Users should customize the number of processors, threads for multiprocessing and threads for single processing to values that suit their hardware
-    parallel_stereo --nodes-list=../nodelist.lis --processes 2 --threads-multiprocess 8 --threads-singleprocess 16 --entry-point 2 --stop-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
+    parallel_stereo --processes 2 --threads-multiprocess 8 --threads-singleprocess 16 --entry-point 2 --stop-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
 
     # finish parallel_stereo using default options for Stage 4 (Triangulation)
-    parallel_stereo --nodes-list=../nodelist.lis --entry-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
+    parallel_stereo --entry-point 4 $L $R -s ${config} results_ba/${i}_ba --bundle-adjust-prefix adjust/ba
     
     cd ../
     echo "Finished parallel_stereo on "$i" at "$(date)
