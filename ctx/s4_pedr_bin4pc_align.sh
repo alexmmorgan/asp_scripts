@@ -149,8 +149,8 @@ inputTAB=${3}_pedr.tab
 projstr=$(gdalsrsinfo -o proj4 $cube | gsed 's/'\''//g')
 echo $projstr
 
-echo "#Latitude,Longitude,Datum_Elevation,Easting,Northing,Orbit" > ${3}_pedr.csv
-proj $projstr $inputTAB | gsed 's/\t/,/g' | gawk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr.csv
+echo "#Latitude,Longitude,Datum_Elevation,Easting,Northing,Orbit" > ${3}_pedr4align.csv
+proj $projstr $inputTAB | gsed 's/\t/,/g' | gawk -F, '{print($5","$4","$3","$1","$2","$6)}' >> ${3}_pedr4align.csv
 
 # # Clean up extraneous files
  rm ${3}_pedr.asc ${3}_pedr.tab
